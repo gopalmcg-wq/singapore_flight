@@ -1,0 +1,42 @@
+name: SQ Flight Checker — BOM → SFO
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes (GHA minimum)
+  workflow_dispatch:         # allows manual trigger from Actions tab
+
+jobs:
+  check-flights:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4       # kill if it hangs (stays under the 5-min window)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Run flight checker
+        env:
+          ALERT_EMAIL_TO:      ${{ secrets.ALERT_EMAIL_TO }}
+          ALERT_EMAIL_FROM:    ${{ secrets.ALERT_EMAIL_FROM }}
+          ALERT_EMAIL_APP_PWD: ${{ secrets.ALERT_EMAIL_APP_PWD }}
+          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python sq_checker.py
+
+      - name: Upload screenshot (always, for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-${{ github.run_number }}
+          path: screenshot.png
+          retention-days: 1
