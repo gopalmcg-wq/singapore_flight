@@ -2,7 +2,7 @@ name: SQ Flight Checker — BOM → SFO
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes (GHA minimum)
+ ##   - cron: "*/5 * * * *"   # every 5 minutes (GHA minimum)
   workflow_dispatch:         # allows manual trigger from Actions tab
 
 jobs:
