@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install playwright
+          pip install playwright requests
           playwright install chromium --with-deps
 
       - name: Run flight checker
